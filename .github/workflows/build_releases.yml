@@ -75,9 +75,9 @@ jobs:
             configuration: ReleaseCU
             release_name: cufilters
             release_ext: exe
-            cuda_download_url: https://developer.download.nvidia.com/compute/cuda/11.7.0/network_installers/cuda_11.7.0_windows_network.exe
+            cuda_download_url: https://developer.download.nvidia.com/compute/cuda/11.8.0/network_installers/cuda_11.8.0_windows_network.exe
             cuda_ver_major: 11
-            cuda_ver_minor: 7
+            cuda_ver_minor: 8
     
     steps:
       - name: Checkout
