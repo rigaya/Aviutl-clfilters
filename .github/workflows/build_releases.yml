@@ -100,11 +100,12 @@ jobs:
         run: |
           curl -s -o cuda_installer.exe -L ${{ matrix.cuda_download_url }}
           cuda_installer.exe -s nvcc_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} cudart_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} curand_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} curand_dev_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} npp_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} npp_dev_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} nvml_dev_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} nvrtc_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} nvrtc_dev_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }} visual_studio_integration_${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}
-          set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}
 
       - name: MSBuild
         run: |
           set OPENCL_HEADERS=${{ github.workspace }}\..\openclheaders
+          if "${{ matrix.release_name }}" == "cufilters" set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}
+          if "${{ matrix.release_name }}" == "cufilters" set CUDA_PATH_V${{ matrix.cuda_ver_major }}_${{ matrix.cuda_ver_minor }}=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}
           msbuild clcufilters.sln /t:build /p:configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.arch }} -maxcpucount
 
       - name: Create Archieve
@@ -112,8 +113,8 @@ jobs:
         run: |
           mkdir clcufilters_release
           copy _build\${{ matrix.platform }}\${{ matrix.configuration }}\${{ matrix.release_name }}.${{ matrix.release_ext }} clcufilters_release
-          if "${{ matrix.release_name }}" == "cufilters" copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}\bin\nvrtc64_${{ matrix.cuda_ver_major }}${{ matrix.cuda_ver_minor }}_0.dll" clcufilters_release
-          if "${{ matrix.release_name }}" == "cufilters" copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}\bin\nvrtc-builtins64_${{ matrix.cuda_ver_major }}${{ matrix.cuda_ver_minor }}.dll" clcufilters_release
+          if "${{ matrix.release_name }}" == "cufilters" copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}\bin\nvrtc64_*_0.dll" clcufilters_release
+          if "${{ matrix.release_name }}" == "cufilters" copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v${{ matrix.cuda_ver_major }}.${{ matrix.cuda_ver_minor }}\bin\nvrtc-builtins64_*.dll" clcufilters_release
           7z a -mx9 ${{ matrix.release_name }}_${{ matrix.configuration }}_${{ needs.get_version_name.outputs.version_name }}.7z .\clcufilters_release\*
 
       - name: Check Version
