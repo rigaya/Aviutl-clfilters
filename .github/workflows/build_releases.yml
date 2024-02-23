@@ -123,6 +123,11 @@ jobs:
         run: |
           powershell "$ver = (Get-ItemProperty .\clcufilters_release\${{ matrix.release_name }}.${{ matrix.release_ext }}).VersionInfo.FileVersion; if ($ver -eq '${{ needs.get_version_name.outputs.version_name }}') { exit 0; } exit 1;"
 
+      - name: Calc hash
+        id: calc_hash
+        run: |
+          7z h -scrc* ${{ matrix.release_name }}_${{ matrix.configuration }}_${{ needs.get_version_name.outputs.version_name }}.7z
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -187,6 +192,11 @@ jobs:
           7z x -oAviutl_clcufilters_release\exe_files\cufilters\x64\ cufilters_ReleaseCU_${{ needs.get_version_name.outputs.version_name }}.7z
           dir /b /s Aviutl_clcufilters_release\
           7z a -mx9 ${{ matrix.release_name }}_${{ needs.get_version_name.outputs.version_name }}.zip .\Aviutl_clcufilters_release\*
+
+      - name: Calc hash
+        id: calc_hash
+        run: |
+          7z h -scrc* ${{ matrix.release_name }}_${{ needs.get_version_name.outputs.version_name }}.zip
 
       - name: Upload Release Asset
         id: upload-release-asset 
