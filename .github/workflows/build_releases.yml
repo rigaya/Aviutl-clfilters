@@ -17,7 +17,7 @@ jobs:
       version_name: ${{ steps.rev.outputs.VERSION_NAME }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set version name
@@ -25,13 +25,13 @@ jobs:
       run: |
         cd ${{ github.workspace }}
         REVCOUNT=`git rev-list --count HEAD`
-        echo "::set-output name=REV_COUNT::${REVCOUNT}"
+        echo "rev_count=${REVCOUNT}" >> $GITHUB_OUTPUT
         if [[ "${{ github.ref }}" =~ "refs/tags/" ]]; then
           VERSION=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
         else
           VERSION=r${REVCOUNT}
         fi
-        echo "::set-output name=VERSION_NAME::${VERSION}"
+        echo "version_name=${VERSION}" >> $GITHUB_OUTPUT
 
   build:
     name: Upload Release Asset
@@ -81,7 +81,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
@@ -91,7 +91,7 @@ jobs:
           git clone https://github.com/KhronosGroup/OpenCL-Headers.git ..\openclheaders
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
         with:
           msbuild-architecture: ${{ matrix.arch }}
           
@@ -124,7 +124,7 @@ jobs:
           powershell "$ver = (Get-ItemProperty .\clcufilters_release\${{ matrix.release_name }}.${{ matrix.release_ext }}).VersionInfo.FileVersion; if ($ver -eq '${{ needs.get_version_name.outputs.version_name }}') { exit 0; } exit 1;"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.release_name }}_${{ matrix.configuration }}_${{ needs.get_version_name.outputs.version_name }}
           path: ${{ matrix.release_name }}_${{ matrix.configuration }}_${{ needs.get_version_name.outputs.version_name }}.7z
@@ -149,25 +149,25 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
 
       - name: Download auf
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: clcufilters_${{ matrix.configuration }}_${{ needs.get_version_name.outputs.version_name }}
           path: clcufilters_${{ matrix.configuration }}_${{ needs.get_version_name.outputs.version_name }}.7z
 
       - name: Download clfilters
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: clfilters_Release_${{ needs.get_version_name.outputs.version_name }}
           path: clfilters_Release_${{ needs.get_version_name.outputs.version_name }}.7z
 
       - name: Download cufilters
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: cufilters_ReleaseCU_${{ needs.get_version_name.outputs.version_name }}
           path: cufilters_ReleaseCU_${{ needs.get_version_name.outputs.version_name }}.7z
