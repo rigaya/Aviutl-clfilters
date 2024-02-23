@@ -198,6 +198,12 @@ jobs:
         run: |
           7z h -scrc* ${{ matrix.release_name }}_${{ needs.get_version_name.outputs.version_name }}.zip
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.release_name }}_${{ needs.get_version_name.outputs.version_name }}
+          path: ${{ matrix.release_name }}_${{ needs.get_version_name.outputs.version_name }}.zip
+
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: softprops/action-gh-release@v1
